@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奇趣廣東話——動詞+身體部位</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            /* Ghibli inspired watercolor nature background */
+            background: linear-gradient(to bottom, #aed9e0 0%, #d8f1d4 40%, #a4d4a4 100%);
+            font-family: 'M PLUS Rounded 1c', 'Nunito', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #333;
+        }
+
+        .ghibli-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border: 3px solid #f0f7f0;
+            box-shadow: 0 15px 35px rgba(45, 74, 34, 0.15);
+            border-radius: 30px;
+        }
+
+        .ghibli-button-primary {
+            background: linear-gradient(135deg, #e59866, #d35400);
+            color: white;
+            border-radius: 9999px;
+            box-shadow: 0 6px 15px rgba(211, 84, 0, 0.3);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 2px solid transparent;
+        }
+
+        .ghibli-button-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(211, 84, 0, 0.4);
+        }
+        
+        .ghibli-button-primary:active {
+            transform: translateY(1px);
+        }
+
+        .option-button {
+            background: white;
+            border: 2px solid #a4d4a4;
+            color: #2d4a22;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .option-button:hover {
+            background: #f0f7f0;
+            transform: translateY(-2px);
+            border-color: #85c285;
+        }
+
+        .option-button.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .option-button.wrong {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        /* Image Placeholder Style */
+        .ghibli-image-container {
+            background: radial-gradient(circle at center, #fffde7 0%, #e0f2f1 100%);
+            border-radius: 24px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            border: 4px solid white;
+        }
+
+        /* Floating Leaves Animation */
+        .leaf {
+            position: absolute;
+            background-color: #85c285;
+            border-radius: 0 50% 0 50%;
+            opacity: 0.6;
+            pointer-events: none;
+            z-index: 0;
+            animation: float-down linear infinite;
+        }
+
+        @keyframes float-down {
+            0% { transform: translateY(-10vh) rotate(0deg) translateX(0); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(110vh) rotate(360deg) translateX(50px); opacity: 0; }
+        }
+
+        .modal-overlay {
+            background: rgba(45, 74, 34, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        .score-badge {
+            background: #f9e79f;
+            color: #d35400;
+            font-weight: 800;
+            border: 2px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Leaderboard table styles */
+        .leaderboard-row:nth-child(even) { background-color: rgba(164, 212, 164, 0.1); }
+        .leaderboard-row:nth-child(odd) { background-color: rgba(255, 255, 255, 0.5); }
+        
+        .medal-1 { color: #FFD700; }
+        .medal-2 { color: #C0C0C0; }
+        .medal-3 { color: #CD7F32; }
+
+    </style>
+</head>
+<body class="relative flex items-center justify-center p-4">
+
+    <!-- Leaf Particles Container -->
+    <div id="particles" class="fixed inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
+    <!-- Screen: Landing -->
+    <div id="screen-landing" class="ghibli-card relative z-10 w-full max-w-lg p-8 text-center animate-[fadeIn_0.5s_ease-out]">
+        <div class="mb-6 flex justify-center">
+            <div class="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-[#a4d4a4] flex items-center justify-center text-6xl">
+                🤪
+            </div>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-bold text-[#2d4a22] mb-4">奇趣廣東話<br><span class="text-xl text-[#5b7c4d] mt-2 block">動詞 + 身體部位</span></h1>
+        <p class="text-[#5b7c4d] mb-8 font-semibold">
+            遊戲規則：共 8 題。<br>答對加 30 分，答錯扣 10 分。<br>準備好成為廣東話達人了嗎？
+        </p>
+        <div class="space-y-4">
+            <button onclick="startGame()" class="ghibli-button-primary w-full py-4 text-xl font-bold">
+                <i class="fa-solid fa-play mr-2"></i> 開始遊戲
+            </button>
+            <button onclick="showScreen('screen-leaderboard')" class="w-full py-3 text-[#d35400] font-bold bg-white border-2 border-[#f9a03f] rounded-full hover:bg-[#fff9f0] transition-colors">
+                <i class="fa-solid fa-trophy mr-2"></i> 查看排行榜
+            </button>
+        </div>
+    </div>
+
+    <!-- Screen: Quiz -->
+    <div id="screen-quiz" class="hidden ghibli-card relative z-10 w-full max-w-xl p-6 md:p-8">
+        <div class="flex justify-between items-center mb-6">
+            <div class="score-badge px-4 py-2 rounded-full text-lg">
+                分數: <span id="current-score">0</span>
+            </div>
+            <div class="text-[#5b7c4d] font-bold text-lg">
+                <span id="current-question-num">1</span> / 8
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-[#e0f2e0] rounded-full h-3 mb-8 overflow-hidden">
+            <div id="progress-bar" class="bg-[#85c285] h-3 rounded-full transition-all duration-500 ease-out" style="width: 12.5%"></div>
+        </div>
+
+        <div class="ghibli-image-container h-48 md:h-56 mb-6" id="question-icon">
+            🤔
+        </div>
+
+        <h2 id="question-text" class="text-2xl font-bold text-[#2d4a22] mb-6 text-center leading-relaxed">
+            載入題目中...
+        </h2>
+
+        <div id="options-container" class="space-y-4">
+            <!-- Options will be injected here -->
+        </div>
+    </div>
+
+    <!-- Modal: Explanation -->
+    <div id="modal-explanation" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-4">
+        <div class="ghibli-card w-full max-w-md p-6 transform transition-transform scale-95 opacity-0" id="explanation-content">
+            <div id="result-icon-container" class="mx-auto w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-inner">
+                <!-- Icon injected by JS -->
+            </div>
+            <h3 id="result-title" class="text-2xl font-bold text-center mb-2">答對了！</h3>
+            <p id="result-score-change" class="text-center font-bold mb-6">+30 分</p>
+            
+            <div class="bg-[#f0f7f0] p-4 rounded-xl mb-6">
+                <h4 id="explain-term" class="text-2xl font-bold text-[#2d4a22] mb-1">詞彙</h4>
+                <p id="explain-jyutping" class="text-sm text-[#5b7c4d] mb-3 font-mono bg-white inline-block px-2 py-1 rounded">jyutping</p>
+                <div class="text-sm text-[#4a6b3d] mb-3 border-l-4 border-[#85c285] pl-3 py-1">
+                    <span class="font-bold">組合：</span> <span id="explain-breakdown">動詞 + 身體部位</span>
+                </div>
+                <p id="explain-text" class="text-[#333] leading-relaxed font-medium">解釋內容...</p>
+            </div>
+
+            <button onclick="nextQuestion()" class="ghibli-button-primary w-full py-3 text-lg font-bold">
+                下一題 <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Screen: Results -->
+    <div id="screen-result" class="hidden ghibli-card relative z-10 w-full max-w-lg p-8 text-center">
+        <div class="text-6xl mb-4">🎉</div>
+        <h2 class="text-3xl font-bold text-[#2d4a22] mb-2">測驗完成！</h2>
+        <p class="text-[#5b7c4d] mb-6">你的最終得分是</p>
+        <div class="text-6xl font-extrabold text-[#d35400] mb-8 drop-shadow-md" id="final-score">
+            0
+        </div>
+
+        <div id="submit-score-section" class="mb-8 p-4 bg-[#fff9f0] rounded-xl border border-[#f9e79f]">
+            <h3 class="font-bold text-[#d35400] mb-3">記錄你的成績！</h3>
+            <input type="text" id="player-name" placeholder="輸入你的名字 (最多10字)" maxlength="10" class="w-full p-3 rounded-lg border-2 border-[#f9a03f] focus:outline-none focus:ring-2 focus:ring-[#f9a03f] mb-3 text-center font-bold text-gray-700">
+            <button onclick="submitScore()" id="submit-btn" class="ghibli-button-primary w-full py-3 font-bold">
+                提交分數到排行榜
+            </button>
+            <p id="submit-msg" class="hidden text-green-600 font-bold mt-2">已提交！</p>
+        </div>
+
+        <div class="flex space-x-4">
+            <button onclick="startGame()" class="flex-1 py-3 text-[#2d4a22] font-bold bg-[#e0f2e0] rounded-full hover:bg-[#d4edda] transition-colors">
+                <i class="fa-solid fa-rotate-right mr-1"></i> 再玩一次
+            </button>
+            <button onclick="showScreen('screen-leaderboard')" class="flex-1 py-3 text-white font-bold bg-[#85c285] rounded-full hover:bg-[#7EA861] transition-colors shadow-md">
+                <i class="fa-solid fa-list-ol mr-1"></i> 排行榜
+            </button>
+        </div>
+    </div>
+
+    <!-- Screen: Leaderboard -->
+    <div id="screen-leaderboard" class="hidden ghibli-card relative z-10 w-full max-w-lg p-6 md:p-8">
+        <div class="flex justify-between items-center mb-6">
+            <button onclick="showScreen('screen-landing')" class="w-10 h-10 rounded-full bg-[#f0f7f0] text-[#2d4a22] hover:bg-[#e0f2e0] flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <h2 class="text-2xl font-bold text-[#2d4a22] flex-1 text-center">🏆 廣東話大師榜</h2>
+            <div class="w-10"></div> <!-- Spacer -->
+        </div>
+
+        <div class="bg-white rounded-xl shadow-inner border border-[#e0f2e0] overflow-hidden mb-6 h-80 overflow-y-auto" id="leaderboard-container">
+            <div class="p-8 text-center text-gray-500" id="leaderboard-loading">
+                <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-[#85c285]"></i>
+                <p>正在載入神秘的卷軸...</p>
+            </div>
+            <table class="w-full text-left hidden" id="leaderboard-table">
+                <thead>
+                    <tr class="bg-[#85c285] text-white">
+                        <th class="p-3 text-center w-16">排名</th>
+                        <th class="p-3">名字</th>
+                        <th class="p-3 text-right">分數</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- Data injected here -->
+                </tbody>
+            </table>
+        </div>
+
+        <button onclick="startGame()" class="ghibli-button-primary w-full py-4 text-xl font-bold">
+            <i class="fa-solid fa-gamepad mr-2"></i> 開始挑戰
+        </button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global State
+        let db = null;
+        let auth = null;
+        let currentAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        
+        let allQuestions = [
+            {
+                term: "卸膊",
+                jyutping: "se3 bok3",
+                verb: "卸 (卸下)",
+                bodyPart: "膊 (肩膀)",
+                question: "在廣東話中，「卸膊」的意思是甚麼？",
+                options: ["推卸責任，不肯承擔", "因為太熱而脫下上衣", "去按摩店按摩肩膀放鬆"],
+                answer: 0,
+                explanation: "「卸」有卸下之意，「膊」是肩膀。將肩膀上的重擔卸下，比喻推卸責任，不肯承擔。",
+                icon: "🤷‍♂️"
+            },
+            {
+                term: "托手踭",
+                jyutping: "tok3 sau2 zaang1",
+                verb: "托 (向上托起)",
+                bodyPart: "手踭 (手肘)",
+                question: "朋友找你幫忙，你卻「托手踭」，即是代表甚麼？",
+                options: ["拒絕別人的請求", "好心幫助別人拿重物", "不小心弄傷了手肘關節"],
+                answer: 0,
+                explanation: "「手踭」即手肘。當別人伸手向你求助，你卻把對方的手肘往上托回去，比喻拒絕別人的請求。",
+                icon: "🙅"
+            },
+            {
+                term: "剃眼眉",
+                jyutping: "tai3 ngaan5 mei4",
+                verb: "剃 (刮除)",
+                bodyPart: "眼眉 (眉毛)",
+                question: "如果有人故意「剃眼眉」，他是在做甚麼？",
+                options: ["當面讓人丟臉、受辱", "去美容院幫人修剪眉毛", "虛情假意地稱讚別人的外貌"],
+                answer: 0,
+                explanation: "眉毛是面部重要特徵。故意剃掉別人的眉毛，比喻當眾讓人難堪、折損別人的面子。",
+                icon: "😠"
+            },
+            {
+                term: "咬耳仔",
+                jyutping: "ngaau5 ji5 zai2",
+                verb: "咬 (輕咬)",
+                bodyPart: "耳仔 (耳朵)",
+                question: "開會時有兩個人在「咬耳仔」，他們在做甚麼？",
+                options: ["湊近耳邊說悄悄話", "因為意見不合而互相攻擊", "互相分享零食吃"],
+                answer: 0,
+                explanation: "兩個人靠得很近說話，嘴巴貼近對方的耳朵，就像在咬對方的耳朵一樣，形容說悄悄話。",
+                icon: "🤫"
+            },
+            {
+                term: "搲爛面",
+                jyutping: "we2 laan6 min6",
+                verb: "搲 (抓破)",
+                bodyPart: "面 (臉皮)",
+                question: "兩人吵架到「搲爛面」的地步，形容甚麼情況？",
+                options: ["撕破臉皮、完全不顧情面", "洗臉太過用力導致受傷", "因為天氣乾燥而嚴重脫皮"],
+                answer: 0,
+                explanation: "「搲」是抓的意思。把臉皮都抓破了，比喻雙方徹底決裂，為求目的不擇手段，完全不顧及以往的情面。",
+                icon: "🤬"
+            },
+            {
+                term: "打心口",
+                jyutping: "daa2 sam1 hau2",
+                verb: "打 (拍打)",
+                bodyPart: "心口 (胸口)",
+                question: "被朋友「打心口」，意思是？",
+                options: ["強行要求別人請客或出錢", "心臟病發作需要立刻急救", "去健身房鍛鍊胸部肌肉"],
+                answer: 0,
+                explanation: "拍打胸口，可以表示「拍胸口保證承擔」；在俗語中也常指強行要求別人請客或出錢（敲竹槓）。",
+                icon: "💸"
+            },
+            {
+                term: "反白眼",
+                jyutping: "faan2 baak6 ngaan5",
+                verb: "反 (翻轉)",
+                bodyPart: "白眼 (眼白)",
+                question: "聽到這個爛笑話，她忍不住「反白眼」，這代表甚麼情緒？",
+                options: ["表示無奈、受不了或鄙視", "眼睛生病需要閉目休息", "專心向上看天空的雲朵"],
+                answer: 0,
+                explanation: "眼珠往上翻，露出眼白。形容對某人的言行感到非常無奈、無語、受不了或是輕視。",
+                icon: "🙄"
+            },
+            {
+                term: "斬手指",
+                jyutping: "zaam2 sau2 zi2",
+                verb: "斬 (砍斷)",
+                bodyPart: "手指 (手指頭)",
+                question: "他發誓說再賭錢就「斬手指」，這通常用來表示甚麼？",
+                options: ["下定決心痛改前非戒除惡習", "準備表演非常危險的魔術", "發生了嚴重的工業意外"],
+                answer: 0,
+                explanation: "以砍斷自己的手指作毒誓，比喻痛下決心去戒除某種不良習慣（如賭博、購物狂等）。",
+                icon: "🔪"
+            },
+            {
+                term: "篤背脊",
+                jyutping: "duk1 bui3 zek3",
+                verb: "篤 (戳 / 指點)",
+                bodyPart: "背脊 (背部)",
+                question: "被同事「篤背脊」，代表發生了甚麼事？",
+                options: ["在背後被打小報告、暗算", "背部肌肉痠痛需要人按摩", "走路時不小心被人撞到背部"],
+                answer: 0,
+                explanation: "「篤」是用手指戳的意思。在別人的背後指指點點或戳人背脊，比喻在背後打小報告、說壞話或暗算別人。",
+                icon: "🗡️"
+            },
+            {
+                term: "扁嘴",
+                jyutping: "bin2 zeoi2",
+                verb: "扁 (弄扁)",
+                bodyPart: "嘴 (嘴巴)",
+                question: "小朋友無故「扁嘴」，通常代表甚麼？",
+                options: ["感到委屈、不高興，準備哭泣", "正在吃很酸的食物", "在做鬼臉逗人開心"],
+                answer: 0,
+                explanation: "把嘴唇拉長變扁。形容人（特別是小孩）感到委屈、不滿意，快要哭出來的表情。",
+                icon: "🥺"
+            }
+        ];
+
+        let selectedQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let currentOptionsOrder = [];
+        let isLeaderboardLoaded = false;
+
+        // Initialize Firebase
+        async function initFirebase() {
+            try {
+                if (typeof __firebase_config !== 'undefined') {
+                    const app = initializeApp(JSON.parse(__firebase_config));
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+                    
+                    if (typeof __initial_auth_token !== 'undefined') {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    console.log("Firebase Auth Success");
+                    fetchLeaderboard();
+                } else {
+                    console.warn("Firebase config not found. Leaderboard will not work.");
+                }
+            } catch (e) {
+                console.error("Firebase init error:", e);
+            }
+        }
+
+        // Generate ambient particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            container.innerHTML = '';
+            for(let i=0; i<15; i++) {
+                let leaf = document.createElement('div');
+                leaf.className = 'leaf';
+                let size = Math.random() * 15 + 10;
+                leaf.style.width = size + 'px';
+                leaf.style.height = size + 'px';
+                leaf.style.left = Math.random() * 100 + 'vw';
+                leaf.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                leaf.style.animationDelay = (Math.random() * 5) + 's';
+                container.appendChild(leaf);
+            }
+        }
+
+        window.showScreen = function(screenId) {
+            document.getElementById('screen-landing').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('screen-leaderboard').classList.add('hidden');
+            
+            const screen = document.getElementById(screenId);
+            screen.classList.remove('hidden');
+            
+            // Add a small bounce animation
+            screen.classList.add('animate-[fadeIn_0.3s_ease-out]');
+        }
+
+        window.startGame = function() {
+            score = 0;
+            currentQuestionIndex = 0;
+            document.getElementById('current-score').innerText = score;
+            
+            // Randomly select 8 questions from 10
+            let shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+            selectedQuestions = shuffled.slice(0, 8);
+            
+            document.getElementById('submit-btn').classList.remove('hidden');
+            document.getElementById('submit-btn').disabled = false;
+            document.getElementById('submit-btn').innerHTML = '提交分數到排行榜';
+            document.getElementById('submit-msg').classList.add('hidden');
+            document.getElementById('player-name').value = '';
+            
+            showScreen('screen-quiz');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = selectedQuestions[currentQuestionIndex];
+            document.getElementById('current-question-num').innerText = currentQuestionIndex + 1;
+            document.getElementById('progress-bar').style.width = `${((currentQuestionIndex) / 8) * 100}%`;
+            
+            // 加上粵語拼音顯示在題目中
+            document.getElementById('question-text').innerHTML = `
+                <span class="block mb-4">
+                    <span class="bg-[#f0f7f0] text-[#2d4a22] px-4 py-2 rounded-full text-xl font-bold border-2 border-[#a4d4a4] inline-block shadow-sm tracking-wide">
+                        ${q.term} <span class="text-[#5b7c4d] font-mono ml-2 text-lg font-normal tracking-normal">${q.jyutping}</span>
+                    </span>
+                </span>
+                ${q.question}
+            `;
+            
+            // Set dynamic background color and icon based on icon
+            const iconContainer = document.getElementById('question-icon');
+            iconContainer.innerHTML = q.icon;
+            
+            // Shuffle options
+            currentOptionsOrder = [0, 1, 2].sort(() => 0.5 - Math.random());
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            currentOptionsOrder.forEach((originalIndex, displayIndex) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-4 text-lg font-medium option-button';
+                btn.innerHTML = `<span class="inline-block w-8 font-bold text-[#85c285]">${String.fromCharCode(65 + displayIndex)}.</span> ${q.options[originalIndex]}`;
+                btn.onclick = () => handleAnswer(originalIndex, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        window.handleAnswer = function(originalIndex, btnElement) {
+            const q = selectedQuestions[currentQuestionIndex];
+            const isCorrect = (originalIndex === q.answer);
+            
+            // Disable all buttons
+            const buttons = document.querySelectorAll('.option-button');
+            buttons.forEach(b => b.disabled = true);
+            
+            if (isCorrect) {
+                btnElement.classList.add('correct');
+                score += 30;
+                showExplanationModal(true, q);
+            } else {
+                btnElement.classList.add('wrong');
+                // Find correct button and highlight it
+                buttons.forEach(b => {
+                    // Check if this button holds the correct answer text
+                    if(b.innerHTML.includes(q.options[q.answer])) {
+                        b.classList.add('correct');
+                    }
+                });
+                score -= 10;
+                showExplanationModal(false, q);
+            }
+            
+            document.getElementById('current-score').innerText = score;
+        }
+
+        function showExplanationModal(isCorrect, q) {
+            const modal = document.getElementById('modal-explanation');
+            const content = document.getElementById('explanation-content');
+            const iconContainer = document.getElementById('result-icon-container');
+            const title = document.getElementById('result-title');
+            const scoreChange = document.getElementById('result-score-change');
+            
+            modal.classList.remove('hidden');
+            
+            // Trigger animation
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            document.getElementById('explain-term').innerText = q.term;
+            document.getElementById('explain-jyutping').innerText = q.jyutping;
+            document.getElementById('explain-breakdown').innerText = `${q.verb} + ${q.bodyPart}`;
+            document.getElementById('explain-text').innerText = q.explanation;
+
+            if (isCorrect) {
+                iconContainer.className = 'mx-auto w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-inner bg-[#d4edda] text-[#28a745]';
+                iconContainer.innerHTML = '<i class="fa-solid fa-check"></i>';
+                title.innerText = '答對了！';
+                title.className = 'text-2xl font-bold text-center mb-2 text-[#28a745]';
+                scoreChange.innerText = '+30 分';
+                scoreChange.className = 'text-center font-bold mb-6 text-[#28a745]';
+                createBurstEffect('#28a745');
+            } else {
+                iconContainer.className = 'mx-auto w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-4 shadow-inner bg-[#f8d7da] text-[#dc3545]';
+                iconContainer.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                title.innerText = '哎呀，答錯了！';
+                title.className = 'text-2xl font-bold text-center mb-2 text-[#dc3545]';
+                scoreChange.innerText = '-10 分';
+                scoreChange.className = 'text-center font-bold mb-6 text-[#dc3545]';
+            }
+        }
+
+        window.nextQuestion = function() {
+            const modal = document.getElementById('modal-explanation');
+            const content = document.getElementById('explanation-content');
+            
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                currentQuestionIndex++;
+                if (currentQuestionIndex < selectedQuestions.length) {
+                    renderQuestion();
+                } else {
+                    endQuiz();
+                }
+            }, 200);
+        }
+
+        function endQuiz() {
+            document.getElementById('progress-bar').style.width = '100%';
+            setTimeout(() => {
+                document.getElementById('final-score').innerText = score;
+                showScreen('screen-result');
+                createBurstEffect('#f9a03f', 50); // Celebration effect
+            }, 500);
+        }
+
+        window.submitScore = async function() {
+            if (!auth || !auth.currentUser) {
+                alert("連接排行榜失敗，請稍後再試。");
+                return;
+            }
+            
+            const nameInput = document.getElementById('player-name').value.trim();
+            const playerName = nameInput === '' ? '無名氏' : nameInput;
+            const btn = document.getElementById('submit-btn');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 提交中...';
+
+            try {
+                // Rule 1 Strict Path: /artifacts/{appId}/public/data/{collectionName}
+                const leaderboardRef = collection(db, 'artifacts', currentAppId, 'public', 'data', 'leaderboard');
+                await addDoc(leaderboardRef, {
+                    name: playerName,
+                    score: score,
+                    timestamp: serverTimestamp()
+                });
+                
+                btn.classList.add('hidden');
+                document.getElementById('submit-msg').classList.remove('hidden');
+                
+            } catch (error) {
+                console.error("Error submitting score: ", error);
+                btn.disabled = false;
+                btn.innerHTML = '提交失敗，請重試';
+            }
+        }
+
+        function fetchLeaderboard() {
+            if (!auth || !auth.currentUser) return;
+
+            const leaderboardRef = collection(db, 'artifacts', currentAppId, 'public', 'data', 'leaderboard');
+            
+            // Rule 2 No Complex Queries: fetch all, sort locally
+            onSnapshot(leaderboardRef, (snapshot) => {
+                let scores = [];
+                snapshot.forEach(doc => {
+                    scores.push({id: doc.id, ...doc.data()});
+                });
+                
+                // Sort descending
+                scores.sort((a, b) => b.score - a.score);
+                
+                renderLeaderboard(scores.slice(0, 10)); // Top 10
+            }, (error) => {
+                console.error("Error fetching leaderboard", error);
+                document.getElementById('leaderboard-loading').innerHTML = '<p class="text-red-500">讀取排行榜失敗</p>';
+            });
+        }
+
+        function renderLeaderboard(scores) {
+            document.getElementById('leaderboard-loading').classList.add('hidden');
+            document.getElementById('leaderboard-table').classList.remove('hidden');
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '';
+            
+            if (scores.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">暫時沒有記錄，快來當第一名！</td></tr>';
+                return;
+            }
+
+            scores.forEach((entry, index) => {
+                let rankIcon = index + 1;
+                if (index === 0) rankIcon = '<i class="fa-solid fa-medal medal-1 text-2xl"></i>';
+                if (index === 1) rankIcon = '<i class="fa-solid fa-medal medal-2 text-xl"></i>';
+                if (index === 2) rankIcon = '<i class="fa-solid fa-medal medal-3 text-lg"></i>';
+
+                const tr = document.createElement('tr');
+                tr.className = 'leaderboard-row border-b border-[#e0f2e0] last:border-0';
+                tr.innerHTML = `
+                    <td class="p-3 text-center font-bold text-gray-600">${rankIcon}</td>
+                    <td class="p-3 font-semibold text-[#2d4a22]">${escapeHTML(entry.name)}</td>
+                    <td class="p-3 text-right font-bold text-[#d35400]">${entry.score}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag])
+            );
+        }
+
+        function createBurstEffect(color, count = 20) {
+            const container = document.getElementById('particles');
+            for(let i=0; i<count; i++) {
+                let p = document.createElement('div');
+                p.style.position = 'absolute';
+                p.style.width = '10px';
+                p.style.height = '10px';
+                p.style.backgroundColor = color;
+                p.style.borderRadius = '50%';
+                p.style.left = '50%';
+                p.style.top = '50%';
+                p.style.zIndex = '60';
+                
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 50 + Math.random() * 100;
+                const tx = Math.cos(angle) * velocity;
+                const ty = Math.sin(angle) * velocity;
+                
+                p.animate([
+                    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+                    { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0)`, opacity: 0 }
+                ], {
+                    duration: 600 + Math.random() * 400,
+                    easing: 'cubic-bezier(0, .9, .57, 1)',
+                    fill: 'forwards'
+                });
+                
+                container.appendChild(p);
+                setTimeout(() => p.remove(), 1000);
+            }
+        }
+
+        // Add tailwind custom keyframes
+        tailwind.config = {
+            theme: {
+                extend: {
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+
+        window.onload = function() {
+            createParticles();
+            initFirebase();
+        };
+
+    </script>
+</body>
+</html>
